@@ -20,8 +20,6 @@ import 'package:localstorage/localstorage.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
 
-
-
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -40,41 +38,39 @@ class HomeBody extends StatefulWidget {
 
 class _HomeBodyState extends State<HomeBody> {
   List<String> videos1 = [
- 
-  'assets/videos/1.mp4',
-  'assets/videos/2.mp4',
-];
+    'assets/videos/1.mp4',
+    'assets/videos/2.mp4',
+  ];
 
-List<String> videos2 = [
-  'assets/videos/4.mp4',
-  'assets/videos/5.mp4',
-  'assets/videos/6.mp4',
-];
+  List<String> videos2 = [
+    'assets/videos/4.mp4',
+    'assets/videos/5.mp4',
+    'assets/videos/6.mp4',
+  ];
 
-List<String> imagesInDisc1 = [
-  'assets/user/user1.png',
-  'assets/user/user2.png',
-  'assets/user/user3.png',
-];
+  List<String> imagesInDisc1 = [
+    'assets/user/user1.png',
+    'assets/user/user2.png',
+    'assets/user/user3.png',
+  ];
 
-List<String> imagesInDisc2 = [
-  'assets/user/user4.png',
-  'assets/user/user3.png',
-  'assets/user/user1.png',
-];
+  List<String> imagesInDisc2 = [
+    'assets/user/user4.png',
+    'assets/user/user3.png',
+    'assets/user/user1.png',
+  ];
 
-var userdata =[];
-  var comment=0;
- List _colors =[ Colors.red,Colors.pink,Colors.yellow];
+  var userdata = [];
+  var comment = 0;
+  List _colors = [Colors.red, Colors.pink, Colors.yellow];
 
-  void initState(){
+  void initState() {
     super.initState();
     // print(FirebaseAuth.instance.currentUser);
     getDocs();
     // handleDynamicLinks();
-  //  FirebaseDynamicLinkService.initDynamicLink();
+    //  FirebaseDynamicLinkService.initDynamicLink();
   }
-
 
 //   void handleDynamicLinks() async {
 //     ///To bring INTO FOREGROUND FROM DYNAMIC LINK.
@@ -95,15 +91,15 @@ var userdata =[];
 
 //   // bool _deeplink = true;
 //   _handleDeepLink(PendingDynamicLinkData data) async {
-  
+
 //      final Uri? deeplink = data.link;
 //     if (deeplink != null) {
 //       print('Handling Deep Link | deepLink: $deeplink');
 //   }
 // }
 
-Future getDocs() async {
-//   QuerySnapshot snap = await 
+  Future getDocs() async {
+//   QuerySnapshot snap = await
 //    FirebaseFirestore.instance.collection('collection').get();
 // snap.forEach((document) {
 //     print(document.documentID);
@@ -116,38 +112,31 @@ Future getDocs() async {
     //     .doc(FirebaseAuth.instance.currentUser!.uid)
     //     .collection("")
     //     .get();
-  //  var  phonee1 = userCredentials.data()!["phone"];
-  // var   namee1 = userCredentials.data()!["name"];
+    //  var  phonee1 = userCredentials.data()!["phone"];
+    // var   namee1 = userCredentials.data()!["name"];
     // print("object ${userCredentials.data()}");
 
-DatabaseReference userRef =
+    DatabaseReference userRef =
         FirebaseDatabase.instance.reference().child('Videos');
 
-         final data = userRef.once().then((snapshot) {
-            var values = snapshot.snapshot.value as Map;
+    final data = userRef.once().then((snapshot) {
+      var values = snapshot.snapshot.value as Map;
 
-             values.values.forEach((values) {
-                var getdata = values.values.toList();
-                // print(getdata);
+      values.values.forEach((values) {
+        var getdata = values.values.toList();
+        // print(getdata);
 
-             for (var i = 0; i < getdata.length; i++) {
-              // print(getdata[i]);
+        for (var i = 0; i < getdata.length; i++) {
+          // print(getdata[i]);
 
-              userdata.add(getdata[i]);
-             }
-             setState(() {
-               
-             });
-            //  print(userdata);
+          userdata.add(getdata[i]);
+        }
+        setState(() {});
+        //  print(userdata);
+      });
+    });
+  }
 
-             });
-
-         });
-}
-
-
-  
- 
   @override
   Widget build(BuildContext context) {
     // List<Tab> tabs = [
@@ -187,62 +176,56 @@ DatabaseReference userRef =
     //               ),
     //             ],
     //           ),
-              
+
     //         ),
     //       ),
-         
+
     //     ],
     //   ),
     // );
 
-   return PageView.builder(
-     physics: const BouncingScrollPhysics(),
-    
-          itemCount: userdata.length,
-          itemBuilder: (context,index){
-            // print(userdata[index]["comment"]);
-            // return Container(
-            // color: _colors[index],
-            // child: Text("Page : "+index.toString()),
+    return PageView.builder(
+      physics: const BouncingScrollPhysics(),
 
-              
-            // );
-         
-            
-            
-           return  VideoPage(
+      itemCount: userdata.length,
+      itemBuilder: (context, index) {
+        // print(userdata[index]["comment"]);
+        // return Container(
+        // color: _colors[index],
+        // child: Text("Page : "+index.toString()),
+
+        // );
+
+        return VideoPage(
             userdata[index]["Video_Link"],
             userdata[index]["Video_Name"],
-           userdata[index]["User_Uid"],
-           userdata[index]["User_Name"],
-           userdata[index]["User_Photo"]
-           );
-          
-          },
-          onPageChanged: FirebaseAuth.instance.currentUser   == null
-            ? (i) async {
-                if (FirebaseAuth.instance.currentUser == null) {
-                  await showModalBottomSheet(
-                    shape: const OutlineInputBorder(
-                        borderSide: BorderSide(color: transparentColor),
-                        borderRadius:
-                            BorderRadius.vertical(top: Radius.circular(16.0))),
-                    context: context,
-                    isScrollControlled: true,
-                    isDismissible: false,
-                    builder: (context) {
-                      return SizedBox(
-                          height: MediaQuery.of(context).size.width * 1.2,
-                          child: Signup());
-                    },
-                  );
-                }
+            userdata[index]["User_Uid"],
+            userdata[index]["User_Name"],
+            userdata[index]["User_Photo"]);
+      },
+      onPageChanged: FirebaseAuth.instance.currentUser == null
+          ? (i) async {
+              if (FirebaseAuth.instance.currentUser == null) {
+                await showModalBottomSheet(
+                  shape: const OutlineInputBorder(
+                      borderSide: BorderSide(color: transparentColor),
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(16.0))),
+                  context: context,
+                  isScrollControlled: true,
+                  isDismissible: false,
+                  builder: (context) {
+                    return SizedBox(
+                        height: MediaQuery.of(context).size.width * 1.2,
+                        child: Signup());
+                  },
+                );
               }
-            : null,
-          scrollDirection: Axis.vertical,
-          // physics: BouncingScrollPhysics(),
-         
-          );
+            }
+          : null,
+      scrollDirection: Axis.vertical,
+      // physics: BouncingScrollPhysics(),
+    );
   }
 }
 
@@ -257,7 +240,8 @@ class VideoPage extends StatefulWidget {
   // final bool? isPaused;
   // final bool? isFollowing;
 
-  VideoPage(this.video,this.image,this.videouid,this.Username,this.userphoto);
+  VideoPage(
+      this.video, this.image, this.videouid, this.Username, this.userphoto);
 
   @override
   _VideoPageState createState() => _VideoPageState();
@@ -268,17 +252,14 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
   bool initialized = false;
   bool isLiked = false;
 
-
-
-
   final LocalStorage storage = new LocalStorage('user');
   var uid;
-  var comment=0;
+  var comment = 0;
 
   @override
   void initState() {
     super.initState();
-    print("data"+widget.video);
+    print("data" + widget.video);
     _controller = VideoPlayerController.network(widget.video)
       ..initialize().then((value) {
         setState(() {
@@ -286,45 +267,47 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
           initialized = true;
         });
         _controller.play();
-
       });
-      //  chkcomment();
-      // getDocs();
+    //  chkcomment();
+    // getDocs();
   }
 
-  chkcomment(){
-    DatabaseReference userRef =
-        FirebaseDatabase.instance.reference().child('Videos').child(widget.videouid).child(widget.image.toString().substring(0,widget.image.toString().length-5));
-    final data = userRef.child("comment").once().then((snapshot){
-      if(snapshot.snapshot.value!=null){
-      var values = snapshot.snapshot.value as Map;
-      values.values.forEach((element) {
-        comment+=1;
-      });
+  chkcomment() {
+    DatabaseReference userRef = FirebaseDatabase.instance
+        .reference()
+        .child('Videos')
+        .child(widget.videouid)
+        .child(widget.image
+            .toString()
+            .substring(0, widget.image.toString().length - 5));
+    final data = userRef.child("comment").once().then((snapshot) {
+      if (snapshot.snapshot.value != null) {
+        var values = snapshot.snapshot.value as Map;
+        values.values.forEach((element) {
+          comment += 1;
+        });
       }
-      setState(() {
-        
-      });
-    }); 
-
-
+      setState(() {});
+    });
   }
-     @override
+
+  @override
   Future<void> share() async {
     await FlutterShare.share(
         title: 'Example share',
         text: 'WAtch This video on Blingo',
         linkUrl: 'https://blingo.page.link/MEGs',
         chooserTitle: 'Example Chooser Title');
-        // print("share");
+    // print("share");
   }
-   @override
+
+  @override
   Future<void> share1() async {
-  final uri = Uri.parse("https://th.bing.com/th/id/OIP.vZXC16lEn6jvJhhFBGKi6AHaEn?w=272&h=180&c=7&r=0&o=5&pid=1.7");
-  final res = http.get(uri);
-
-
+    final uri = Uri.parse(
+        "https://th.bing.com/th/id/OIP.vZXC16lEn6jvJhhFBGKi6AHaEn?w=272&h=180&c=7&r=0&o=5&pid=1.7");
+    final res = http.get(uri);
   }
+
   @override
   void didPopNext() {
     // print("didPopNext");
@@ -357,7 +340,7 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
   }
 
 // Future getDocs() async {
-// //   QuerySnapshot snap = await 
+// //   QuerySnapshot snap = await
 // //    FirebaseFirestore.instance.collection('collection').get();
 // // snap.forEach((document) {
 // //     print(document.documentID);
@@ -374,7 +357,6 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
 //   // var   namee1 = userCredentials.data()!["name"];
 //     // print("object ${userCredentials.data()}");
 
-
 //     var  db =await FirebaseDatabase.instance.ref("Videos").child(FirebaseAuth.instance.currentUser!.uid)
 //     .once().then(( snapshot){
 //     // print(snapshot.snapshot.value);
@@ -384,8 +366,7 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
 //         // print(db1.values.toList()[i]["Video_Link"]);
 //           // print(db1.values.toList()[i]["User_Uid"]);
 //       // print(db1.length);
-     
-    
+
 //       // for(var j=0;j<db1.length;j++){
 //       //   print(db1[j]["User_Uid"]);
 
@@ -397,57 +378,98 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
 //   });
 
 //     // print(db.value);
-  
-
 
 // }
 
-
-likenow() async {
-     DatabaseReference db =
+  likenow() async {
+    var votes = 0;
+    DatabaseReference db =
         FirebaseDatabase.instance.reference().child("Videos");
 
-    
     await db
         .child(widget.videouid.toString())
-        .child(widget.image.toString().substring(0, widget.image.toString().length - 5))
-        .child("comment")
-        .child(widget.key.toString())
-        .update({
-      "comment": com.text,
-      "user_uid": FirebaseAuth.instance.currentUser!.uid,
-      "Video_Name": widget.image.toString().substring(0, widget.image.toString().length - 5),
-      "Comment_User_Uid": FirebaseAuth.instance.currentUser!.uid,
-      "Comment_Id":widget.key,
-      "User_Photo": FirebaseAuth.instance.currentUser!.photoURL,
-     
-      "User_Name":FirebaseAuth.instance.currentUser!.displayName 
-    });
+        .child(widget.image
+            .toString()
+            .substring(0, widget.image.toString().length - 5))
+        .child("Like")
+        .once()
+        .then((value) async {
+      print(value.snapshot.value);
+      var data = value.snapshot.value;
 
-}
+      if (data == null) {
+        await db
+            .child(widget.videouid.toString())
+            .child(widget.image
+                .toString()
+                .substring(0, widget.image.toString().length - 5))
+            .child("Like")
+            .update({"total_Votes": votes + 1});
+
+        var key = db
+            .child(widget.videouid.toString())
+            .child(widget.image
+                .toString()
+                .substring(0, widget.image.toString().length - 5))
+            .child("Like")
+            .child("userVotes")
+            .push()
+            .key;
+
+        await db
+            .child(widget.videouid.toString())
+            .child(widget.image
+                .toString()
+                .substring(0, widget.image.toString().length - 5))
+            .child("Like")
+            .child("userVotes")
+            .child(key.toString())
+            .set({
+          "votekey": key.toString(),
+          "useuid": FirebaseAuth.instance.currentUser!.uid
+        });
+      }
+      else{
+          var data1 = value.snapshot.value as Map;
+          print(data1["total_Votes"]);
+
+          await db
+            .child(widget.videouid.toString())
+            .child(widget.image
+                .toString()
+                .substring(0, widget.image.toString().length - 5))
+            .child("Like")
+            .child("userVotes").once().then((value){
+              print(value.snapshot.value);
+
+              var data1 = value.snapshot.value as Map;
+            });
+
+
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    if( initialized==false){
+    if (initialized == false) {
       return SafeArea(
         child: Container(
           color: Colors.black,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-      
             children: [
-            Center(
-              child: Container(
-                // height: 100,
-                child: CircularProgressIndicator(
-                      backgroundColor: Colors.redAccent,
-                      valueColor: AlwaysStoppedAnimation(Colors.green),
-                      strokeWidth: 5,
-                      
-                    ),
+              Center(
+                child: Container(
+                  // height: 100,
+                  child: CircularProgressIndicator(
+                    backgroundColor: Colors.redAccent,
+                    valueColor: AlwaysStoppedAnimation(Colors.green),
+                    strokeWidth: 5,
+                  ),
+                ),
               ),
-            ),
             ],
           ),
         ),
@@ -468,12 +490,10 @@ likenow() async {
     // if (widget.pageIndex == 2) _controller.pause();
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      
-      body: 
-      // initialized==false?
-      // Container()
-      Stack(
-      
+      body:
+          // initialized==false?
+          // Container()
+          Stack(
         children: <Widget>[
           GestureDetector(
             onTap: () {
@@ -486,12 +506,14 @@ likenow() async {
                 : const SizedBox.shrink(),
           ),
           Positioned.directional(
-            textDirection:  Directionality.of(context),
-           
-           bottom: 80.0,
-             child: Container(
-              margin: EdgeInsets.all(10),
-              child: Text(widget.Username,style: TextStyle(color: Colors.black,fontSize: 2),))),
+              textDirection: Directionality.of(context),
+              bottom: 80.0,
+              child: Container(
+                  margin: EdgeInsets.all(10),
+                  child: Text(
+                    widget.Username,
+                    style: TextStyle(color: Colors.black, fontSize: 2),
+                  ))),
           Positioned.directional(
             textDirection: Directionality.of(context),
             end: -10.0,
@@ -506,7 +528,7 @@ likenow() async {
                   //   Navigator.pushNamed(context, PageRoutes.userProfilePage);
                   // },
                   child: CircleAvatar(
-                    backgroundImage: NetworkImage(widget.userphoto)),
+                      backgroundImage: NetworkImage(widget.userphoto)),
                   // child: const CircleAvatar(
                   //     backgroundImage: NetworkImage("${widget.userphoto.toString()}")),
                 ),
@@ -517,6 +539,7 @@ likenow() async {
                   ),
                   '8.2k',
                   onPressed: () {
+                    likenow();
                     setState(() {
                       isLiked = !isLiked;
                     });
@@ -528,9 +551,9 @@ likenow() async {
                       color: secondaryColor,
                     ),
                     comment.toString(), onPressed: () {
-                      // print(widget.image);
-                      chkcomment();
-                  commentSheet(context,widget.image,widget.videouid);
+                  // print(widget.image);
+                  chkcomment();
+                  commentSheet(context, widget.image, widget.videouid);
                 }),
                 //  CustomButton(
                 //   ImageIcon(
@@ -539,27 +562,24 @@ likenow() async {
                 //   ),
                 //   '1.2k',onPressed: getDocs,
 
-                  
                 // ),
-                
+
                 CustomButton(
                   ImageIcon(
                     const AssetImage('assets/icons/ic_views.png'),
                     color: secondaryColor,
                   ),
-                  '1.2k',onPressed: share,
-
-                  
+                  '1.2k',
+                  onPressed: share,
                 ),
-                 CustomButton(
+                CustomButton(
                     Icon(
                       Icons.add,
                       color: secondaryColor,
                     ),
                     '287', onPressed: () {
-                 Navigator.push(context, 
-                 MaterialPageRoute(builder: (context)=>UploadVideo())
-                 );
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => UploadVideo()));
                 }),
                 // Padding(
                 //   padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -619,7 +639,7 @@ likenow() async {
           // )
           // FutureBuilder(builder:(context,snapshot){
           //   return Text((""));
-            
+
           // },
           // future: chkcomment(),
           // )
@@ -628,4 +648,3 @@ likenow() async {
     );
   }
 }
-
