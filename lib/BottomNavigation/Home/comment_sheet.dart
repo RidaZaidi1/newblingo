@@ -58,7 +58,7 @@ print(dateStr);
         .child(videouid.toString())
         .child(image.toString().substring(0, image.toString().length - 5))
         .child("comment")
-        .child(key.key.toString())
+        .push()
         .update({
       "comment": com.text,
       "user_uid": FirebaseAuth.instance.currentUser!.uid,
@@ -71,6 +71,8 @@ print(dateStr);
       "User_Name":FirebaseAuth.instance.currentUser!.displayName ,
      
     });
+
+    com.text="";
   }
 
  getcomment()async {

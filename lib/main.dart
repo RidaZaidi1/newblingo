@@ -26,6 +26,7 @@ Future<void> main() async {
       child: BlocProvider(
     create: (context) => LanguageCubit(),
     child: const MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Blingo(),
     ),
   )));

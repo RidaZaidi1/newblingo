@@ -25,9 +25,14 @@ import 'package:blingo2/BottomNavigation/Explore/explore_page.dart';
 import 'package:blingo2/BottomNavigation/MyProfile/following.dart';
 import 'package:flutter_share/flutter_share.dart';
 
-class MyProfilePage extends StatelessWidget {
+class MyProfilePage extends StatefulWidget {
   const MyProfilePage({Key? key}) : super(key: key);
 
+  @override
+  State<MyProfilePage> createState() => _MyProfilePageState();
+}
+
+class _MyProfilePageState extends State<MyProfilePage> {
   @override
   Widget build(BuildContext context) {
     if (FirebaseAuth.instance.currentUser?.uid != null) {
@@ -80,6 +85,29 @@ class _MyProfileBodyState extends State<MyProfileBody> {
   TextEditingController Link = TextEditingController();
 
   @override
+
+  void initState(){
+    super.initState();
+    generatelink();
+    
+  }
+
+
+  Future<void> generatelink() async {
+
+     var generate =
+           await FirebaseDynamicLinkService
+         .createDynamicLink( FirebaseAuth.instance.currentUser!.uid);
+
+         print(generate);
+
+         setState(() {
+           Link.text=generate;
+         });
+
+
+
+  }
 
    Future<void> share() async {
     await FlutterShare.share(
@@ -178,30 +206,30 @@ class _MyProfileBodyState extends State<MyProfileBody> {
                                                   color: darkColor),
                                             ),
                                             // ignore: prefer_const_constructors
-                                            PopupMenuItem(
-                                              child: GestureDetector(
-                                                  onTap: () async {
-                                                    var generate =
-                                                        await FirebaseDynamicLinkService
-                                                            .createDynamicLink(
-                                                                FirebaseAuth
-                                                                    .instance
-                                                                    .currentUser!
-                                                                    .uid);
-                                                    print(generate);
-                                                    //  setState(() {
-                                                    //    userlink= generate;
-                                                    //  });
-                                                    setState(() {
-                                                      Link.text = generate;
-                                                    });
-                                                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>ShowLink("https://blingo.page.link/MEGs")));
-                                                  },
-                                                  child: Text("Refernce Link")),
-                                              onTap: () {},
-                                              textStyle: const TextStyle(
-                                                  color: darkColor),
-                                            )
+                                            // PopupMenuItem(
+                                            //   child: GestureDetector(
+                                            //       onTap: () async {
+                                            //         var generate =
+                                            //             await FirebaseDynamicLinkService
+                                            //                 .createDynamicLink(
+                                            //                     FirebaseAuth
+                                            //                         .instance
+                                            //                         .currentUser!
+                                            //                         .uid);
+                                            //         print(generate);
+                                            //         //  setState(() {
+                                            //         //    userlink= generate;
+                                            //         //  });
+                                            //         setState(() {
+                                            //           Link.text = generate;
+                                            //         });
+                                            //         // Navigator.push(context, MaterialPageRoute(builder: (context)=>ShowLink("https://blingo.page.link/MEGs")));
+                                            //       },
+                                            //       child: Text("Refernce Link")),
+                                            //   onTap: () {},
+                                            //   textStyle: const TextStyle(
+                                            //       color: darkColor),
+                                            // )
                                           ];
                                         },
                                       ),

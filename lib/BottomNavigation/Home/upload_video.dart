@@ -72,12 +72,12 @@ class _UploadVideoState extends State<UploadVideo> {
      DatabaseReference db = FirebaseDatabase.instance.reference().child("Videos");
 
 
-     db.child("SPAvuFl9CLaHtaR1pJWyx6Ix0mP2").child(imageNameget.toString().substring(0,imageNameget.toString().length-5)).set({
+     db.child(FirebaseAuth.instance.currentUser!.uid).child(imageNameget.toString().substring(0,imageNameget.toString().length-5)).set({
        "Video_Link":imagepath,
-      "User_Uid":"SPAvuFl9CLaHtaR1pJWyx6Ix0mP2",
+      "User_Uid":FirebaseAuth.instance.currentUser!.uid,
       "Video_Name":imageNameget,
-      "User_Photo":"https://firebasestorage.googleapis.com/v0/b/blingo-25d1d.appspot.com/o/userPhotos?alt=media&token=0a166f09-cf31-4659-8033-e4bce74f522d",
-      "User_Name":"User"
+      "User_Photo":FirebaseAuth.instance.currentUser!.photoURL,
+      "User_Name":FirebaseAuth.instance.currentUser!.displayName,
 
      }); 
 

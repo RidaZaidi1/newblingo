@@ -1,4 +1,6 @@
 // import 'package:blingo2/Services/Firebase_dynamic_link.dart';
+import 'dart:io';
+
 import 'package:blingo2/Auth/Signup/signup.dart';
 import 'package:blingo2/BottomNavigation/Home/comment_sheet.dart';
 import 'package:blingo2/BottomNavigation/Home/upload_video.dart';
@@ -17,8 +19,10 @@ import 'package:blingo2/Locale/locale.dart';
 import 'package:blingo2/Theme/colors.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:video_player/video_player.dart';
 import 'package:http/http.dart' as http;
+// import 'package:share_plus/share_plus.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -255,11 +259,19 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
   final LocalStorage storage = new LocalStorage('user');
   var uid;
   var comment = 0;
+  var like=0;
+
+  var userphoto="";
+  var username="";
 
   @override
   void initState() {
     super.initState();
-    print("data" + widget.video);
+    print("data" + widget.videouid);
+     photonameget();
+
+     countlike();
+
     _controller = VideoPlayerController.network(widget.video)
       ..initialize().then((value) {
         setState(() {
@@ -268,11 +280,59 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
         });
         _controller.play();
       });
-    //  chkcomment();
+     chkcomment();
     // getDocs();
   }
 
+
+  countlike() async {
+      DatabaseReference userRef = await FirebaseDatabase.instance
+        .reference()
+        .child('Videos')
+        .child(widget.videouid)
+        .child(widget.image
+            .toString()
+            .substring(0, widget.image.toString().length - 5));
+      userRef.child("Like").once().then((value){
+        print(value.snapshot.value);
+        var data = value.snapshot.value;
+
+        if(data==null){
+          like=0;
+          
+        }
+        else{
+          data as Map;
+          // print(data["total_Votes"]);
+
+          like= data["total_Votes"];
+        }
+      });
+
+      setState(() {
+        
+      });
+
+  }
+
+
+  Future<void> photonameget() async {
+       await FirebaseFirestore.instance
+            .collection('users')
+            .doc(widget.videouid)
+            .get().then((value) {
+              print(value.data()!["photoUrl"]);
+
+              setState(() {
+                userphoto=value.data()!["photoUrl"];
+                username=value.data()!["displayName"];
+              });
+            });
+    
+  }
+
   chkcomment() {
+    comment=0;
     DatabaseReference userRef = FirebaseDatabase.instance
         .reference()
         .child('Videos')
@@ -296,7 +356,7 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
     await FlutterShare.share(
         title: 'Example share',
         text: 'WAtch This video on Blingo',
-        linkUrl: 'https://blingo.page.link/MEGs',
+        linkUrl: widget.video,
         chooserTitle: 'Example Chooser Title');
     // print("share");
   }
@@ -428,16 +488,16 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
           "votekey": key.toString(),
           "useuid": FirebaseAuth.instance.currentUser!.uid
         });
+         countlike();
       }
       else{
+        
           var data1 = value.snapshot.value as Map;
           print(data1["total_Votes"]);
         
 
         votes=data1["total_Votes"];
-
-            var chkuser=false;
-
+        var chkuser=false;
           await db
             .child(widget.videouid.toString())
             .child(widget.image
@@ -452,18 +512,24 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
               data1.forEach((key, value) { 
                 print(value["useuid"]);
 
-                if(value["useruid"]==FirebaseAuth.instance.currentUser!.uid){
+                print("data"+FirebaseAuth.instance.currentUser!.uid);
+
+                if(value["useuid"]==FirebaseAuth.instance.currentUser!.uid.toString()){
+                  print("data");
                   chkuser=true;
                 }
-
               });
 
             });
+
+            print(chkuser);
 
             if(chkuser==true){
               print("already Link");
             }
             else{
+
+               countlike();
                await db
             .child(widget.videouid.toString())
             .child(widget.image
@@ -472,11 +538,53 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
             .child("Like")
             .update({"total_Votes": votes + 1});
 
+             var key = db
+            .child(widget.videouid.toString())
+            .child(widget.image
+                .toString()
+                .substring(0, widget.image.toString().length - 5))
+            .child("Like")
+            .child("userVotes")
+            .push()
+            .key;
+
+        await db
+            .child(widget.videouid.toString())
+            .child(widget.image
+                .toString()
+                .substring(0, widget.image.toString().length - 5))
+            .child("Like")
+            .child("userVotes")
+            .child(key.toString())
+            .set({
+          "votekey": key.toString(),
+          "useuid": FirebaseAuth.instance.currentUser!.uid
+        });
+        
+
             }
 
 
       }
     });
+  }
+
+  Future<void> videoshare() async {
+      final imageurl = "https://firebasestorage.googleapis.com/v0/b/blingo-25d1d.appspot.com/o/videos%2Fimage_picker7334452646137150980.mp4'?alt=media&token=aa1d50fb-9a02-42b4-8c06-4bd9fd08bfb2";
+                  final uri = Uri.parse(imageurl);
+
+                  print(imageurl);
+                  final response = await http.get(uri);
+                  final bytes = response.bodyBytes;
+                  print(bytes);
+                  final temp = await getTemporaryDirectory();
+                  print(temp);
+                  final path = '${temp.path}/v1.mp4';
+                  File(path).writeAsBytesSync(bytes);
+                  print(path);
+                  FlutterShare.shareFile(
+                    title: "title", filePath: path);
+                  // await Share.shareFiles([path]);
   }
 
   @override
@@ -541,7 +649,7 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
                   margin: EdgeInsets.all(10),
                   child: Text(
                     widget.Username,
-                    style: TextStyle(color: Colors.black, fontSize: 2),
+                    style: TextStyle(color: Colors.black, fontSize: 20),
                   ))),
           Positioned.directional(
             textDirection: Directionality.of(context),
@@ -557,7 +665,7 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
                   //   Navigator.pushNamed(context, PageRoutes.userProfilePage);
                   // },
                   child: CircleAvatar(
-                      backgroundImage: NetworkImage(widget.userphoto)),
+                      backgroundImage: NetworkImage(userphoto)),
                   // child: const CircleAvatar(
                   //     backgroundImage: NetworkImage("${widget.userphoto.toString()}")),
                 ),
@@ -566,9 +674,10 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
                     Icons.favorite,
                     color: isLiked ? mainColor : secondaryColor,
                   ),
-                  '8.2k',
+                  like.toString(),
                   onPressed: () {
                     likenow();
+                    
                     setState(() {
                       isLiked = !isLiked;
                     });
@@ -581,7 +690,7 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
                     ),
                     comment.toString(), onPressed: () {
                   // print(widget.image);
-                  chkcomment();
+                chkcomment();
                   commentSheet(context, widget.image, widget.videouid);
                 }),
                 //  CustomButton(
