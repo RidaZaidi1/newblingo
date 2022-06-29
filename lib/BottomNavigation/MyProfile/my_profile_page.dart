@@ -23,6 +23,7 @@ import 'package:blingo2/BottomNavigation/MyProfile/followers.dart';
 import 'package:blingo2/Theme/colors.dart';
 import 'package:blingo2/BottomNavigation/Explore/explore_page.dart';
 import 'package:blingo2/BottomNavigation/MyProfile/following.dart';
+import 'package:flutter_share/flutter_share.dart';
 
 class MyProfilePage extends StatelessWidget {
   const MyProfilePage({Key? key}) : super(key: key);
@@ -79,6 +80,17 @@ class _MyProfileBodyState extends State<MyProfileBody> {
   TextEditingController Link = TextEditingController();
 
   @override
+
+   Future<void> share() async {
+    await FlutterShare.share(
+        title: 'Example share',
+        text: 'WAtch This video on Blingo',
+        linkUrl: Link.text,
+        chooserTitle: 'Share Link');
+        // print("share");
+  }
+
+
   Widget build(BuildContext context) {
     var locale = AppLocalizations.of(context);
     return FutureBuilder<DocumentSnapshot<Map<String, dynamic>>>(
@@ -334,10 +346,14 @@ class _MyProfileBodyState extends State<MyProfileBody> {
                                                         InputBorder.none,
                                                   )),
                                             ),
-                                            Icon(
-                                              Icons.share,
-                                              size: 20,
-                                              color: Colors.white,
+                                            GestureDetector(
+                                              onTap:  share,
+                                              child: Icon(
+                                                Icons.share,
+                                                size: 20,
+                                                color: Colors.white,
+                                                
+                                              ),
                                             )
                                           ],
                                         )
