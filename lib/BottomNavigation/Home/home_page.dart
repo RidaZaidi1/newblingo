@@ -432,6 +432,11 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
       else{
           var data1 = value.snapshot.value as Map;
           print(data1["total_Votes"]);
+        
+
+        votes=data1["total_Votes"];
+
+            var chkuser=false;
 
           await db
             .child(widget.videouid.toString())
@@ -442,8 +447,32 @@ class _VideoPageState extends State<VideoPage> with RouteAware {
             .child("userVotes").once().then((value){
               print(value.snapshot.value);
 
+            
               var data1 = value.snapshot.value as Map;
+              data1.forEach((key, value) { 
+                print(value["useuid"]);
+
+                if(value["useruid"]==FirebaseAuth.instance.currentUser!.uid){
+                  chkuser=true;
+                }
+
+              });
+
             });
+
+            if(chkuser==true){
+              print("already Link");
+            }
+            else{
+               await db
+            .child(widget.videouid.toString())
+            .child(widget.image
+                .toString()
+                .substring(0, widget.image.toString().length - 5))
+            .child("Like")
+            .update({"total_Votes": votes + 1});
+
+            }
 
 
       }
